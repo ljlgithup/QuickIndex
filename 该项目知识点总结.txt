@@ -1,0 +1,93 @@
+		
+					快速索引知识点总结
+		
+		自定义快速索引控件:
+				1),  绘制字母A-Z, 
+					1.计算每个单元格的高度，宽度。
+						int    mHeight = getMeasuredHeight();
+						float	   cellHeight = mHeight *1.0f/LETTERS.length;
+						float    cellWidth = getMeasuredWidth();
+					2.计算绘制每个单元格的起始坐标，使用新的API获取要绘制字母的宽高
+						 Rect rect = new Rect();
+						 paint.getTextBounds(letter,0,letter.length(),rect);
+						  float x = cellWidth*0.5f - rect.width()*0.5f;
+						  float y = cellHeight*0.5f + rect.height()*0.5f + i*cellHeight;
+					3.遍历字母A-Z，逐个绘制。
+						canvas.drawText(letter,x,y,paint);
+				2), 处理触摸事件, 
+					  1.获取当前竖直方向Y的值，从而获取当前位置的索引
+				3), 监听回调传递信息, 
+					  1.将当前索引的字母，回调给MainActivity
+				4), 汉字->拼音, (工具类)
+					1.先到入PingYin4.jar，在导入工具类
+				5), 通过拼音进行排序展示,
+					//给集合排序
+					Collections.sort(list);
+					list集合的bean对象必须实现Comparable<PersonInfo>重写此方法。
+					@Override
+					    public int compareTo(PersonInfo another) {
+						return this.pinyin.compareTo(another.pinyin);
+					    }
+				6), 根据拼音首字母分组, (判断首字母是否一致，如果不一致就显示字母的条目)
+					PersonInfo info = list.get(position);
+					holder.tv_name.setText(info.getName());
+					//获取拼音，截取首字母
+					String currentLetter = info.getPinyin().charAt(0)+"";
+					//把相同的字母放到一组。判断字母是否变化
+					if(position==0){
+					    holder.tv_letter.setText(currentLetter);
+					    holder.tv_letter.setVisibility(View.VISIBLE);
+					}else{
+					    //获取上一个字母,判断当前的字母跟上一个字母是否一致
+					   String lastLetter = list.get(position-1).getPinyin().charAt(0)+"";
+					    if(!TextUtils.equals(currentLetter,lastLetter)){
+						holder.tv_letter.setText(currentLetter);
+						holder.tv_letter.setVisibility(View.VISIBLE);
+					    }else{
+						holder.tv_letter.setVisibility(View.GONE);
+					    }
+				7), 将ListView和QuickIndexBar结合起来,
+					将ListView滑动到指定的字母上。
+					 //在滑动字母时，也更新ListView到指定的字母位置
+					for(int i=0;i<list.size();i++){
+					    String chart = list.get(i).getPinyin().charAt(0)+"";
+					    if(TextUtils.equals(letter,chart)){
+						lv_list.setSelection(i);
+						break;
+					    }
+					}
+				8),break，continue,return直间的区别？
+					break，结束for循环。如果是嵌套的for循环，只能结束当前的for循环。
+					continue，结束当前的循环，执行下一次的循环。
+					return，结束当前的方法。
+					public static void test() {
+						for (int i = 0; i < 10; i++) {
+							if (i == 3) {结束当前的循环
+							// break;//结束当前的循环
+							// continue;//i=3的时候结束这一次的循环,继续执行i=4的循环
+							return;// 直接结束整个函数
+							}
+							System.out.println("----" + i);
+						}
+						System.out.println("-111--");
+					}
+					当为break的时候：
+						----0
+						----1
+						----2
+						-111--
+					当为continue的时候：
+						----0
+						----1
+						----2
+						----4
+						----5
+						----6
+						----7
+						----8
+						----9
+						-111--
+					当为return的时候：
+						----0
+						----1
+						----2
